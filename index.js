@@ -53,13 +53,13 @@ class AppInstall {
   }
 
   launchAppiOS() {
-    const appStoreUrl = `https://apps.apple.com/app/id${this.appID}`
     window.location = this.scheme
-
+    
     setTimeout(() => {
+      const appStoreUrl = `https://apps.apple.com/app/id${this.appID}`
       // If the user is still here, open the App Store
       window.location = appStoreUrl
-    }, 2500)  // Adjust timeout as needed
+    }, 250)
 
     return "iOS"
   }
