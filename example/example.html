@@ -14,6 +14,7 @@
         app.setScheme('gipskamer://')
         app.setAppID('1359090156')
         app.setPackageName('nl.olvg.gipskamer')
+        app.setQueryParams([{key: 'id', value: '123'}, {key: 'name', value: 'John Doe'}])
 
         document.getElementById('os').textContent = app.getOperatingSystem()
 

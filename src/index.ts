@@ -3,7 +3,10 @@ class AppInstall {
   appID: string
   packageName: string
   operatingSystem: string
-  queryParams: String[]
+  queryParams: {
+      key: string
+      value: string
+    }[]
 
   constructor(scheme = 'yourapp://', appID = '1234567890', packageName = 'com.example.yourapp') {
     this.scheme = scheme
@@ -26,7 +29,7 @@ class AppInstall {
     this.packageName = packageName
   }
 
-  setQueryParams(queryParams: String[]) {
+  setQueryParams(queryParams: { key: string, value: string }[]) {
     this.queryParams = queryParams
   }
 
@@ -112,18 +115,18 @@ class AppInstall {
 
   formatQueryParams() {
     if (this.queryParams.length === 0) {
-      return ""
+      return ''
     }
 
-    let formattedQueryParams = "?"
-    for (let i = 0; i < this.queryParams.length; i++) {
-      formattedQueryParams += this.queryParams[i]
-      if (i < this.queryParams.length - 1) {
-        formattedQueryParams += "&"
+    let queryParamsString = '?'
+    this.queryParams.forEach((param, index) => {
+      queryParamsString += `${param.key}=${param.value}`
+      if (index < this.queryParams.length - 1) {
+        queryParamsString += '&'
       }
-    }
+    })
 
-    return formattedQueryParams
+    return queryParamsString
   }
 }
 
