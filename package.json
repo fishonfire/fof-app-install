@@ -1,0 +1,27 @@
+{
+  "name": "fof-app-install",
+  "version": "0.0.1",
+  "description": "FoF app install is a simple to use package to detect and deeplink to a app. App does not exist on device? Redirect to store page.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fishonfire/fof-app-install"
+  },
+  "keywords": [
+    "deeplink",
+    "app",
+    "install",
+    "store",
+    "android",
+    "ios"
+  ],
+  "author": "Menno Jongejan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fishonfire/fof-app-install/issues"
+  },
+  "homepage": "https://github.com/fishonfire/fof-app-install#readme"
+}
