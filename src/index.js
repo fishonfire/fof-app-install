@@ -1,4 +1,9 @@
 class AppInstall {
+  scheme
+  appID
+  packageName
+  operatingSystem
+
   constructor(scheme = 'yourapp://', appID = '1234567890', packageName = 'com.example.yourapp') {
     this.scheme = scheme
     this.appID = appID
@@ -7,12 +12,12 @@ class AppInstall {
     this.operatingSystem = this.getOperatingSystem()
   }
 
-  setScheme(scheme) {
-    this.scheme = scheme
-  }
-
   setAppID(appID) {
     this.appID = appID
+  }
+
+  setScheme(scheme) {
+    this.scheme = scheme
   }
 
   setPackageName(packageName) {
@@ -53,12 +58,12 @@ class AppInstall {
   }
 
   launchAppiOS() {
-    window.location = this.scheme
+    window.location.href = this.scheme
     
     setTimeout(() => {
       const appStoreUrl = `https://apps.apple.com/app/id${this.appID}`
       // If the user is still here, open the App Store
-      window.location = appStoreUrl
+      window.location.href = appStoreUrl
     }, 250)
 
     return "iOS"
