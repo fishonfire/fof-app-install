@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Launch Example</title>
+    <script type="module">
+      import AppInstall from './index.js'
+
+      document.addEventListener('DOMContentLoaded', () => {
+        console.log('loaded')
+        const app = new AppInstall()
+
+        // Optionally set custom properties if different from defaults
+        app.setScheme('nl.olvg.gipskamer://')
+        app.setAppID('1359090156')
+        app.setPackageName('nl.olvg.gipskamer')
+
+        document.getElementById('os').textContent = app.getOperatingSystem()
+
+        console.log(app.operatingSystem)
+
+        // Example usage: Trigger app launch
+        document.getElementById('launchApp').addEventListener('click', () => {
+            const result = app.launchApp()
+            console.log(result) // Check the console for what happens
+        })
+      })
+    </script>
+</head>
+<body>
+  <h1>App Launch Test</h1>
+  <button id="launchApp">Launch App</button>
+  <p id="os"></p>
+</body>
+</html>
