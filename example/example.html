@@ -5,10 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>App Launch Example</title>
     <script type="module">
-      import AppInstall from '../src/index.js'
+      import AppInstall from '../dist/index.js'
 
       document.addEventListener('DOMContentLoaded', () => {
-        console.log('loaded')
         const app = new AppInstall()
 
         // Optionally set custom properties if different from defaults
@@ -22,8 +21,16 @@
 
         // Example usage: Trigger app launch
         document.getElementById('launchApp').addEventListener('click', () => {
-            const result = app.launchApp()
-            console.log(result) // Check the console for what happens
+          const result = app.launchApp()
+          console.log(result)
+        })
+
+        // Example usage: Trigger copy url
+        document.getElementById('copyUrl').addEventListener('click', () => {
+          document.getElementById('copy').textContent = 'Copying...'
+          const result = app.copyUrlToClipboard()
+          document.getElementById('copy').textContent = 'Done'
+          console.log(result)
         })
       })
     </script>
@@ -32,5 +39,7 @@
   <h1>App Launch Test</h1>
   <button id="launchApp">Launch App</button>
   <p id="os"></p>
+  <button id="copyUrl">Copy App url</button>
+  <p id="copy"></p>
 </body>
 </html>

@@ -3,6 +3,7 @@ class AppInstall {
   appID: string
   packageName: string
   operatingSystem: string
+  queryParams: String[]
 
   constructor(scheme = 'yourapp://', appID = '1234567890', packageName = 'com.example.yourapp') {
     this.scheme = scheme
@@ -10,6 +11,7 @@ class AppInstall {
     this.packageName = packageName
     this.operatingSystem = 'unknown'
     this.operatingSystem = this.getOperatingSystem()
+    this.queryParams = []
   }
 
   setAppID(appID: string) {
@@ -22,6 +24,10 @@ class AppInstall {
 
   setPackageName(packageName: string) {
     this.packageName = packageName
+  }
+
+  setQueryParams(queryParams: String[]) {
+    this.queryParams = queryParams
   }
 
   getOperatingSystem() {
@@ -52,13 +58,48 @@ class AppInstall {
     }
   }
 
+
   launchAppAndroid() {
-    window.location.href = `intent://${this.scheme}/#Intent;scheme=${this.scheme};package=${this.packageName};end`
-    return "android"
+    window.location.href = `intent://open${this.formatQueryParams()}#Intent;scheme=${this.scheme};package=${this.packageName};end`
+    return "android";
+  }
+
+  copyUrlToClipboard() {
+    const os = this.getOperatingSystem()
+    let url
+    if (os === "Android") {
+      const queryParamsString = this.formatQueryParams()
+      url = `intent://open${queryParamsString}#Intent;scheme=${this.scheme};package=${this.packageName};end`
+    } else if (os === "iOS") {
+      url = `${this.scheme}${this.formatQueryParams()}`
+    } else {
+      url = 'URL not available for this OS'
+    }
+  
+    var dummy = document.createElement("textarea");
+    document.body.appendChild(dummy);
+    dummy.value = url;
+
+    if (os === 'iOS') {
+      dummy.contentEditable = 'true';
+      dummy.readOnly = true;
+      var range = document.createRange();
+      range.selectNodeContents(dummy);
+      var selection = window.getSelection();
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+      dummy.setSelectionRange(0, 999999);
+    }
+    else {
+      dummy.select();
+    }
+
+    document.execCommand("copy");
+    document.body.removeChild(dummy);
   }
 
   launchAppiOS() {
-    window.location.href = this.scheme
+    window.location.href = `${this.scheme}${this.formatQueryParams()}`
     
     setTimeout(() => {
       const appStoreUrl = `https://apps.apple.com/app/id${this.appID}`
@@ -67,6 +108,22 @@ class AppInstall {
     }, 250)
 
     return "iOS"
+  }
+
+  formatQueryParams() {
+    if (this.queryParams.length === 0) {
+      return ""
+    }
+
+    let formattedQueryParams = "?"
+    for (let i = 0; i < this.queryParams.length; i++) {
+      formattedQueryParams += this.queryParams[i]
+      if (i < this.queryParams.length - 1) {
+        formattedQueryParams += "&"
+      }
+    }
+
+    return formattedQueryParams
   }
 }
 
