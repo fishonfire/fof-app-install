@@ -1,5 +1,5 @@
 class AppInstall {
-    constructor(scheme = 'yourapp://', appID = '1234567890', packageName = 'com.example.yourapp') {
+    constructor(scheme = 'example://', appID = '1234567890', packageName = 'com.example.app') {
         this.scheme = scheme;
         this.appID = appID;
         this.packageName = packageName;
@@ -45,13 +45,14 @@ class AppInstall {
         }
     }
     launchAppAndroid() {
-        window.location.href = `intent://open${this.formatQueryParams()}#Intent;scheme=${this.scheme};package=${this.packageName};end`;
+        window.location.href = `intent://${this.scheme}${this.formatQueryParams()}/#Intent;scheme=${this.scheme};package=${this.packageName};end`;
         return "android";
     }
     copyUrlToClipboard() {
         const os = this.getOperatingSystem();
         let url;
         if (os === "Android") {
+            console.log('Copy to clibpoard android');
             const queryParamsString = this.formatQueryParams();
             url = `intent://open${queryParamsString}#Intent;scheme=${this.scheme};package=${this.packageName};end`;
         }
@@ -91,16 +92,16 @@ class AppInstall {
     }
     formatQueryParams() {
         if (this.queryParams.length === 0) {
-            return "";
+            return '';
         }
-        let formattedQueryParams = "?";
-        for (let i = 0; i < this.queryParams.length; i++) {
-            formattedQueryParams += this.queryParams[i];
-            if (i < this.queryParams.length - 1) {
-                formattedQueryParams += "&";
+        let queryParamsString = '?';
+        this.queryParams.forEach((param, index) => {
+            queryParamsString += `${param.key}=${param.value}`;
+            if (index < this.queryParams.length - 1) {
+                queryParamsString += '&';
             }
-        }
-        return formattedQueryParams;
+        });
+        return queryParamsString;
     }
 }
 export default AppInstall;

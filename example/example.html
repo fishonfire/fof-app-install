@@ -11,9 +11,9 @@
         const app = new AppInstall()
 
         // Optionally set custom properties if different from defaults
-        app.setScheme('gipskamer://')
+        app.setScheme('viscocustomerapp://')
         app.setAppID('1359090156')
-        app.setPackageName('nl.olvg.gipskamer')
+        app.setPackageName('nl.visco.customerapp')
         app.setQueryParams([{key: 'id', value: '123'}, {key: 'name', value: 'John Doe'}])
 
         document.getElementById('os').textContent = app.getOperatingSystem()

@@ -8,7 +8,7 @@ class AppInstall {
       value: string
     }[]
 
-  constructor(scheme = 'viscocustomerapp://', appID = '1234567890', packageName = 'nl.visco.customerapp') {
+  constructor(scheme = 'example://', appID = '1234567890', packageName = 'com.example.app') {
     this.scheme = scheme
     this.appID = appID
     this.packageName = packageName
@@ -72,6 +72,7 @@ class AppInstall {
     const os = this.getOperatingSystem()
     let url
     if (os === "Android") {
+      console.log('Copy to clibpoard android')
       const queryParamsString = this.formatQueryParams()
       url = `intent://open${queryParamsString}#Intent;scheme=${this.scheme};package=${this.packageName};end`
     } else if (os === "iOS") {
