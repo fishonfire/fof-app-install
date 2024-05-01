@@ -8,7 +8,7 @@ class AppInstall {
       value: string
     }[]
 
-  constructor(scheme = 'yourapp://', appID = '1234567890', packageName = 'com.example.yourapp') {
+  constructor(scheme = 'viscocustomerapp://', appID = '1234567890', packageName = 'nl.visco.customerapp') {
     this.scheme = scheme
     this.appID = appID
     this.packageName = packageName
@@ -63,8 +63,9 @@ class AppInstall {
 
 
   launchAppAndroid() {
-    window.location.href = `intent://open${this.formatQueryParams()}#Intent;scheme=${this.scheme};package=${this.packageName};end`
-    return "android";
+    window.location.href = `intent://${this.scheme}${this.formatQueryParams()}/#Intent;scheme=${this.scheme};package=${this.packageName};end`
+
+    return "android"
   }
 
   copyUrlToClipboard() {
