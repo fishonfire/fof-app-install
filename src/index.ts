@@ -7,6 +7,8 @@ class AppInstall {
       key: string
       value: string
     }[]
+  isPromptHidden: boolean;
+  isAppOpened: boolean;
 
   constructor(scheme = 'example://', appID = '1234567890', packageName = 'com.example.app') {
     this.scheme = scheme
@@ -15,6 +17,8 @@ class AppInstall {
     this.operatingSystem = 'unknown'
     this.operatingSystem = this.getOperatingSystem()
     this.queryParams = []
+    this.isPromptHidden = false;
+    this.isAppOpened = false;
   }
 
   setAppID(appID: string) {
@@ -80,7 +84,7 @@ class AppInstall {
     } else {
       url = 'URL not available for this OS'
     }
-  
+
     var dummy = document.createElement("textarea");
     document.body.appendChild(dummy);
     dummy.value = url;
@@ -103,16 +107,44 @@ class AppInstall {
     document.body.removeChild(dummy);
   }
 
-  launchAppiOS() {
-    window.location.href = `${this.scheme}${this.formatQueryParams()}`
-    
-    setTimeout(() => {
-      const appStoreUrl = `https://apps.apple.com/app/id${this.appID}`
-      // If the user is still here, open the App Store
-      window.location.href = appStoreUrl
-    }, 250)
+  handleVisibilityChange(): void {
+    if (document.hidden) {
+      console.log('[handleVisibilityChange] Page is in the background or hidden');
+      this.isAppOpened = true;
+    }
+  }
 
-    return "iOS"
+  launchAppiOS(): string {
+    this.isPromptHidden = false;
+    this.isAppOpened = false;
+
+    document.addEventListener('visibilitychange', this.handleVisibilityChange);
+
+    const appUrl = `${this.scheme}${this.formatQueryParams()}`;
+    const storeUrl = `https://apps.apple.com/app/id${this.appID}`;
+
+    window.location.href = appUrl;
+
+    window.addEventListener('focus', () => {
+      console.log('[focus]');
+
+      if (this.isPromptHidden && this.isAppOpened) {
+        console.log('[focus] App was already previously opened - exit');
+        return;
+      }
+
+      this.isPromptHidden = true;
+
+      setTimeout(() => {
+        if (this.isPromptHidden && !this.isAppOpened) {
+          console.log('[focus][timeout] Redirecting to store');
+          window.location.href = storeUrl;
+          this.isAppOpened = true;
+        }
+      }, 1000); // Worth checking if 1 second is enough time to open app on other devices
+    });
+
+    return "iOS";
   }
 
   formatQueryParams() {
