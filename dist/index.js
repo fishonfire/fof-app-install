@@ -6,6 +6,8 @@ class AppInstall {
         this.operatingSystem = 'unknown';
         this.operatingSystem = this.getOperatingSystem();
         this.queryParams = [];
+        this.isPromptHidden = false;
+        this.isAppOpened = false;
     }
     setAppID(appID) {
         this.appID = appID;
@@ -81,13 +83,34 @@ class AppInstall {
         document.execCommand("copy");
         document.body.removeChild(dummy);
     }
+    handleVisibilityChange() {
+        if (document.hidden) {
+            console.log('[handleVisibilityChange] Page is in the background or hidden');
+            this.isAppOpened = true;
+        }
+    }
     launchAppiOS() {
-        window.location.href = `${this.scheme}${this.formatQueryParams()}`;
-        setTimeout(() => {
-            const appStoreUrl = `https://apps.apple.com/app/id${this.appID}`;
-            // If the user is still here, open the App Store
-            window.location.href = appStoreUrl;
-        }, 250);
+        this.isPromptHidden = false;
+        this.isAppOpened = false;
+        document.addEventListener('visibilitychange', this.handleVisibilityChange);
+        const appUrl = `${this.scheme}${this.formatQueryParams()}`;
+        const storeUrl = `https://apps.apple.com/app/id${this.appID}`;
+        window.location.href = appUrl;
+        window.addEventListener('focus', () => {
+            console.log('[focus]');
+            if (this.isPromptHidden && this.isAppOpened) {
+                console.log('[focus] App was already previously opened - exit');
+                return;
+            }
+            this.isPromptHidden = true;
+            setTimeout(() => {
+                if (this.isPromptHidden && !this.isAppOpened) {
+                    console.log('[focus][timeout] Redirecting to store');
+                    window.location.href = storeUrl;
+                    this.isAppOpened = true;
+                }
+            }, 1000); // Worth checking if 1 second is enough time to open app on other devices
+        });
         return "iOS";
     }
     formatQueryParams() {
