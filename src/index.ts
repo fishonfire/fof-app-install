@@ -1,6 +1,7 @@
 class AppInstall {
   scheme: string
   appID: string
+  timeout: number
   packageName: string
   operatingSystem: string
   queryParams: {
@@ -10,7 +11,7 @@ class AppInstall {
   isPromptHidden: boolean;
   isAppOpened: boolean;
 
-  constructor(scheme = 'example://', appID = '1234567890', packageName = 'com.example.app') {
+  constructor(scheme = 'example://', appID = '1234567890', packageName = 'com.example.app', timeout = 1000) {
     this.scheme = scheme
     this.appID = appID
     this.packageName = packageName
@@ -19,6 +20,7 @@ class AppInstall {
     this.queryParams = []
     this.isPromptHidden = false;
     this.isAppOpened = false;
+    this.timeout = timeout
   }
 
   setAppID(appID: string) {
@@ -31,6 +33,10 @@ class AppInstall {
 
   setPackageName(packageName: string) {
     this.packageName = packageName
+  }
+
+  setTimeout(timeout: number) {
+    this.timeout = timeout
   }
 
   setQueryParams(queryParams: { key: string, value: string }[]) {
@@ -141,7 +147,7 @@ class AppInstall {
           window.location.href = storeUrl;
           this.isAppOpened = true;
         }
-      }, 1000); // Worth checking if 1 second is enough time to open app on other devices
+      }, this.timeout); // Worth checking if 1 second is enough time to open app on other devices
     });
 
     return "iOS";
