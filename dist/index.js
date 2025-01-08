@@ -1,5 +1,5 @@
 class AppInstall {
-    constructor(scheme = 'example://', appID = '1234567890', packageName = 'com.example.app') {
+    constructor(scheme = 'example://', appID = '1234567890', packageName = 'com.example.app', timeout = 1000) {
         this.scheme = scheme;
         this.appID = appID;
         this.packageName = packageName;
@@ -8,6 +8,7 @@ class AppInstall {
         this.queryParams = [];
         this.isPromptHidden = false;
         this.isAppOpened = false;
+        this.timeout = timeout;
     }
     setAppID(appID) {
         this.appID = appID;
@@ -17,6 +18,9 @@ class AppInstall {
     }
     setPackageName(packageName) {
         this.packageName = packageName;
+    }
+    setTimeout(timeout) {
+        this.timeout = timeout;
     }
     setQueryParams(queryParams) {
         this.queryParams = queryParams;
@@ -109,7 +113,7 @@ class AppInstall {
                     window.location.href = storeUrl;
                     this.isAppOpened = true;
                 }
-            }, 1000); // Worth checking if 1 second is enough time to open app on other devices
+            }, this.timeout); // Worth checking if 1 second is enough time to open app on other devices
         });
         return "iOS";
     }
