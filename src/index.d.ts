@@ -14,6 +14,12 @@ export default class AppInstall {
   setAppID(appID: string): void;
 
   /**
+   * Sets the timeout for how long the package waits to detect if the app is already installed.
+   * @param timeout The timeout in ms.
+   */
+  setTimeout(timeout: number): void;
+
+  /**
    * Attempts to determine the operating system of the device.
    * @returns Returns 'Android', 'iOS', or 'unknown' based on the user agent.
    */
