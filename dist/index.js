@@ -1,3 +1,12 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 class AppInstall {
     constructor(scheme = 'example://', appID = '1234567890', packageName = 'com.example.app', timeout = 1000) {
         this.scheme = scheme;
@@ -39,53 +48,64 @@ class AppInstall {
         return "unknown";
     }
     launchApp() {
-        const os = this.getOperatingSystem();
-        if (os === "Android") {
-            return this.launchAppAndroid();
-        }
-        else if (os === "iOS") {
-            return this.launchAppiOS();
-        }
-        else {
-            return "unknown";
-        }
+        this.copyUrlToClipboard().then(() => {
+            const os = this.getOperatingSystem();
+            if (os === "Android") {
+                return this.launchAppAndroid();
+            }
+            else if (os === "iOS") {
+                return this.launchAppiOS();
+            }
+            else {
+                return "unknown";
+            }
+        });
     }
     launchAppAndroid() {
         window.location.href = `intent://${this.scheme}${this.formatQueryParams()}/#Intent;scheme=${this.scheme};package=${this.packageName};end`;
         return "android";
     }
     copyUrlToClipboard() {
-        const os = this.getOperatingSystem();
-        let url;
-        if (os === "Android") {
-            console.log('Copy to clibpoard android');
-            const queryParamsString = this.formatQueryParams();
-            url = `intent://open${queryParamsString}#Intent;scheme=${this.scheme};package=${this.packageName};end`;
+        return __awaiter(this, void 0, void 0, function* () {
+            const os = this.getOperatingSystem();
+            let url;
+            if (os === "Android") {
+                const queryParamsString = this.formatQueryParams();
+                url = `intent://open${queryParamsString}#Intent;scheme=${this.scheme};package=${this.packageName};end`;
+            }
+            else if (os === "iOS") {
+                url = `${this.scheme}${this.formatQueryParams()}`;
+            }
+            else {
+                url = 'URL not available for this OS';
+            }
+            return yield this.copyTextToClipboard(url);
+        });
+    }
+    fallbackCopyTextToClipboard(text) {
+        var textArea = document.createElement('textarea');
+        textArea.value = text;
+        // Avoid scrolling to bottom
+        textArea.style.top = '0';
+        textArea.style.left = '0';
+        textArea.style.position = 'fixed';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+            document.execCommand('copy');
         }
-        else if (os === "iOS") {
-            url = `${this.scheme}${this.formatQueryParams()}`;
-        }
-        else {
-            url = 'URL not available for this OS';
-        }
-        var dummy = document.createElement("textarea");
-        document.body.appendChild(dummy);
-        dummy.value = url;
-        if (os === 'iOS') {
-            dummy.contentEditable = 'true';
-            dummy.readOnly = true;
-            var range = document.createRange();
-            range.selectNodeContents(dummy);
-            var selection = window.getSelection();
-            selection === null || selection === void 0 ? void 0 : selection.removeAllRanges();
-            selection === null || selection === void 0 ? void 0 : selection.addRange(range);
-            dummy.setSelectionRange(0, 999999);
-        }
-        else {
-            dummy.select();
-        }
-        document.execCommand("copy");
-        document.body.removeChild(dummy);
+        catch (err) { }
+        document.body.removeChild(textArea);
+    }
+    copyTextToClipboard(text) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!navigator.clipboard) {
+                this.fallbackCopyTextToClipboard(text);
+                return new Promise((r) => setTimeout(r, 250));
+            }
+            return navigator.clipboard.writeText(text);
+        });
     }
     handleVisibilityChange() {
         if (document.hidden) {
@@ -101,15 +121,12 @@ class AppInstall {
         const storeUrl = `https://apps.apple.com/app/id${this.appID}`;
         window.location.href = appUrl;
         window.addEventListener('focus', () => {
-            console.log('[focus]');
             if (this.isPromptHidden && this.isAppOpened) {
-                console.log('[focus] App was already previously opened - exit');
                 return;
             }
             this.isPromptHidden = true;
             setTimeout(() => {
                 if (this.isPromptHidden && !this.isAppOpened) {
-                    console.log('[focus][timeout] Redirecting to store');
                     window.location.href = storeUrl;
                     this.isAppOpened = true;
                 }
