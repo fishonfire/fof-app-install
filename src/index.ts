@@ -81,16 +81,7 @@ class AppInstall {
   }
 
   async copyUrlToClipboard() {
-    const os = this.getOperatingSystem()
-    let url
-    if (os === "Android") {
-      const queryParamsString = this.formatQueryParams()
-      url = `intent://open${queryParamsString}#Intent;scheme=${this.scheme};package=${this.packageName};end`
-    } else if (os === "iOS") {
-      url = `${this.scheme}${this.formatQueryParams()}`
-    } else {
-      url = 'URL not available for this OS'
-    }
+    const url = `${this.scheme}${this.formatQueryParams()}`
 
     return await this.copyTextToClipboard(url)
   }
