@@ -103,24 +103,17 @@ class AppInstall {
         }
     }
     launchAppiOS() {
-        this.isPromptHidden = false;
         this.isAppOpened = false;
         document.addEventListener('visibilitychange', this.handleVisibilityChange);
         const appUrl = `${this.scheme}${this.formatQueryParams()}`;
         const storeUrl = `https://apps.apple.com/app/id${this.appID}`;
         window.location.href = appUrl;
-        // window.addEventListener('focus', () => {
-        //   if (this.isPromptHidden && this.isAppOpened) {
-        //     return;
-        //   }
-        //   this.isPromptHidden = true;
         setTimeout(() => {
-            if (this.isPromptHidden && !this.isAppOpened) {
+            if (!this.isAppOpened) {
                 window.location.href = storeUrl;
                 this.isAppOpened = true;
             }
-        }, this.timeout); // Worth checking if 1 second is enough time to open app on other devices
-        // });
+        }, this.timeout);
         return "iOS";
     }
     formatQueryParams() {
