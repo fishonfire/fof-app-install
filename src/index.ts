@@ -119,7 +119,6 @@ class AppInstall {
   }
 
   launchAppiOS(): string {
-    this.isPromptHidden = false;
     this.isAppOpened = false;
 
     document.addEventListener('visibilitychange', this.handleVisibilityChange);
@@ -127,16 +126,14 @@ class AppInstall {
     const appUrl = `${this.scheme}${this.formatQueryParams()}`;
     const storeUrl = `https://apps.apple.com/app/id${this.appID}`;
 
-    try {
-      window.location.href = appUrl;
-    } catch (e) {
-      setTimeout(() => {
-        if (this.isPromptHidden && !this.isAppOpened) {
-          window.location.href = storeUrl;
-          this.isAppOpened = true;
-        }
-      }, this.timeout);
-    }
+    window.location.href = appUrl;
+
+    setTimeout(() => {
+      if (!this.isAppOpened) {
+        window.location.href = storeUrl;
+        this.isAppOpened = true;
+      }
+    }, this.timeout);
 
     return "iOS";
   }
