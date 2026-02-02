@@ -109,18 +109,18 @@ class AppInstall {
         const appUrl = `${this.scheme}${this.formatQueryParams()}`;
         const storeUrl = `https://apps.apple.com/app/id${this.appID}`;
         window.location.href = appUrl;
-        window.addEventListener('focus', () => {
-            if (this.isPromptHidden && this.isAppOpened) {
-                return;
+        // window.addEventListener('focus', () => {
+        //   if (this.isPromptHidden && this.isAppOpened) {
+        //     return;
+        //   }
+        //   this.isPromptHidden = true;
+        setTimeout(() => {
+            if (this.isPromptHidden && !this.isAppOpened) {
+                window.location.href = storeUrl;
+                this.isAppOpened = true;
             }
-            this.isPromptHidden = true;
-            setTimeout(() => {
-                if (this.isPromptHidden && !this.isAppOpened) {
-                    window.location.href = storeUrl;
-                    this.isAppOpened = true;
-                }
-            }, this.timeout); // Worth checking if 1 second is enough time to open app on other devices
-        });
+        }, this.timeout); // Worth checking if 1 second is enough time to open app on other devices
+        // });
         return "iOS";
     }
     formatQueryParams() {

@@ -129,12 +129,12 @@ class AppInstall {
 
     window.location.href = appUrl;
 
-    window.addEventListener('focus', () => {
-      if (this.isPromptHidden && this.isAppOpened) {
-        return;
-      }
+    // window.addEventListener('focus', () => {
+    //   if (this.isPromptHidden && this.isAppOpened) {
+    //     return;
+    //   }
 
-      this.isPromptHidden = true;
+    //   this.isPromptHidden = true;
 
       setTimeout(() => {
         if (this.isPromptHidden && !this.isAppOpened) {
@@ -142,7 +142,7 @@ class AppInstall {
           this.isAppOpened = true;
         }
       }, this.timeout); // Worth checking if 1 second is enough time to open app on other devices
-    });
+    // });
 
     return "iOS";
   }
