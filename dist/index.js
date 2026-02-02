@@ -93,7 +93,13 @@ class AppInstall {
                 this.fallbackCopyTextToClipboard(text);
                 return new Promise((r) => setTimeout(r, 250));
             }
-            return navigator.clipboard.writeText(text);
+            try {
+                return yield navigator.clipboard.writeText(text);
+            }
+            catch (err) {
+                this.fallbackCopyTextToClipboard(text);
+                return new Promise((r) => setTimeout(r, 250));
+            }
         });
     }
     handleVisibilityChange() {
