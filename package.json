@@ -1,6 +1,6 @@
 {
   "name": "fof-app-install",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "FoF app install is a simple to use package to detect and deeplink to an app. If the app does not exist on the device? Redirect to the store page.",
   "main": "./dist/index.js",
   "types": "./types/index.d.ts",
