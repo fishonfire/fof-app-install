@@ -10,8 +10,9 @@ class AppInstall {
     }[]
   isPromptHidden: boolean;
   isAppOpened: boolean;
+  debugDiv: HTMLDivElement | null = null;
 
-  constructor(scheme = 'example://', appID = '1234567890', packageName = 'com.example.app', timeout = 1000) {
+  constructor(scheme = 'example://', appID = '1234567890', packageName = 'com.example.app', timeout = 1000, debugDiv = null) {
     this.scheme = scheme
     this.appID = appID
     this.packageName = packageName
@@ -20,7 +21,8 @@ class AppInstall {
     this.queryParams = []
     this.isPromptHidden = false;
     this.isAppOpened = false;
-    this.timeout = timeout
+    this.timeout = timeout;
+    this.debugDiv = debugDiv;
   }
 
   setAppID(appID: string) {
@@ -61,15 +63,22 @@ class AppInstall {
   }
 
   launchApp() {
+    this.addDebugMessage('[launchApp] Starting app launch process');
     this.copyUrlToClipboard().then(() => {
+      this.addDebugMessage('[launchApp] URL copied to clipboard');
       const os = this.getOperatingSystem()
+      this.addDebugMessage('[launchApp] Detected operating system: ' + os);
       if (os === "Android") {
         return this.launchAppAndroid()
       } else if (os === "iOS") {
         return this.launchAppiOS()
       } else {
+        this.addDebugMessage('[launchApp] Stopped app launch process due to unknown operating system');
         return "unknown"
       }
+    }).catch(() => {
+      this.addDebugMessage('[launchApp] Error launching app');
+      return "error";
     })
   }
 
@@ -77,11 +86,15 @@ class AppInstall {
   launchAppAndroid() {
     window.location.href = `intent://${this.scheme}${this.formatQueryParams()}/#Intent;scheme=${this.scheme};package=${this.packageName};end`
 
+    this.addDebugMessage('[launchAppAndroid] Attempting to launch app with URL: ' + `intent://${this.scheme}${this.formatQueryParams()}/#Intent;scheme=${this.scheme};package=${this.packageName};end`);
+
     return "android"
   }
 
   async copyUrlToClipboard() {
     const url = `${this.scheme}${this.formatQueryParams()}`
+
+    this.addDebugMessage('[copyUrlToClipboard] Starting to copy URL to clipboard: ' + url);
 
     return await this.copyTextToClipboard(url)
   }
@@ -98,19 +111,28 @@ class AppInstall {
     textArea.select();
     try {
       document.execCommand('copy');
-    } catch (err) {}
-    document.body.removeChild(textArea);
+      this.addDebugMessage('[fallbackCopyTextToClipboard] Successfully copied URL using fallback method: ' + text);
+      return Promise.resolve();
+    } catch (err) {
+      this.addDebugMessage('[fallbackCopyTextToClipboard] Error copying URL using fallback method: ' + text);
+      return Promise.reject();
+    } finally {
+      document.body.removeChild(textArea);
+    }
   }
 
   async copyTextToClipboard(text: string) {
     if (!navigator.clipboard) {
+      this.addDebugMessage('[copyTextToClipboard] Clipboard API not available, using fallback method');
       this.fallbackCopyTextToClipboard(text);
       return new Promise((r) => setTimeout(r, 250));
     }
 
     try {
+      this.addDebugMessage('[copyTextToClipboard] Using Clipboard API to copy URL: ' + text);
       return await navigator.clipboard.writeText(text);
     } catch (err) {
+      this.addDebugMessage('[copyTextToClipboard] Error using Clipboard API, using fallback method');
       this.fallbackCopyTextToClipboard(text);
       return new Promise((r) => setTimeout(r, 250));
     }
@@ -119,14 +141,17 @@ class AppInstall {
 
   handleVisibilityChange(): void {
     if (document.hidden) {
-      console.log('[handleVisibilityChange] Page is in the background or hidden');
+      this.addDebugMessage('[handleVisibilityChange] Page is in the background or hidden');
       this.isAppOpened = true;
     }
   }
 
   launchAppiOS(): string {
+    this.addDebugMessage('[launchAppiOS] Attempting to launch app with URL: ' + `${this.scheme}${this.formatQueryParams()}`);
     this.isAppOpened = false;
 
+
+    this.addDebugMessage('[launchAppiOS] Adding event listener for visibility change');
     document.addEventListener('visibilitychange', this.handleVisibilityChange);
 
     const appUrl = `${this.scheme}${this.formatQueryParams()}`;
@@ -136,6 +161,7 @@ class AppInstall {
 
     setTimeout(() => {
       if (!this.isAppOpened) {
+        this.addDebugMessage('[launchAppiOS] App not opened, redirecting to App Store');
         window.location.href = storeUrl;
         this.isAppOpened = true;
       }
@@ -158,6 +184,17 @@ class AppInstall {
     })
 
     return queryParamsString
+  }
+
+  addDebugMessage(message: string) {
+    const debugInfo = `${new Date().toISOString()} | ${message}`;
+    if (this.debugDiv) {
+      const p = document.createElement('p');
+      p.textContent = debugInfo;
+      this.debugDiv.appendChild(p);
+    } else {
+      console.log(debugInfo);
+    }
   }
 }
 
