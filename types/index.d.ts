@@ -7,14 +7,14 @@ declare class AppInstall {
       key: string
       value: string
     }[];
-    constructor(scheme?: string, appID?: string, packageName?: string);
+    constructor(scheme?: string, appID?: string, packageName?: string, timeout?: number, debugDiv?: HTMLDivElement | null);
     setAppID(appID: string): void;
     setPackageName(packageName: string): void;
     getOperatingSystem(): string;
     launchApp(): string;
     launchAppAndroid(): string;
     launchAppiOS(): string;
-    setQueryParams(): void;
-    copyUrlToClipboard(): string;
+    setQueryParams(queryParams: { key: string, value: string }[]): void;
+    copyUrlToClipboard(): Promise<void>;
 }
 export default AppInstall;
