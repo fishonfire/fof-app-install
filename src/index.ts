@@ -100,32 +100,44 @@ class AppInstall {
   }
 
   fallbackCopyTextToClipboard(text: string) {
-    var textArea = document.createElement('textarea');
-    textArea.value = text;
-    // Avoid scrolling to bottom
-    textArea.style.top = '0';
-    textArea.style.left = '0';
-    textArea.style.position = 'fixed';
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
-    try {
-      document.execCommand('copy');
-      this.addDebugMessage('[fallbackCopyTextToClipboard] Successfully copied URL using fallback method: ' + text);
-      return Promise.resolve();
-    } catch (err) {
-      this.addDebugMessage('[fallbackCopyTextToClipboard] Error copying URL using fallback method: ' + text);
-      return Promise.reject();
-    } finally {
-      document.body.removeChild(textArea);
-    }
+    return new Promise<void>((resolve, reject) => {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+
+      textArea.style.position = 'fixed';
+      textArea.style.top = '0';
+      textArea.style.left = '0';
+      textArea.style.opacity = '0';
+      textArea.setAttribute('readonly', '');
+
+      document.body.appendChild(textArea);
+
+      textArea.focus();
+      textArea.select();
+      textArea.setSelectionRange(0, text.length);
+
+      try {
+        const ok = document.execCommand('copy');
+        if (ok) {
+          this.addDebugMessage(`[fallbackCopyTextToClipboard] Copied using fallback: ${text}`);
+          resolve();
+        } else {
+          this.addDebugMessage(`[fallbackCopyTextToClipboard] execCommand returned false (copy likely blocked): ${text}`);
+          reject(new Error('execCommand(copy) returned false'));
+        }
+      } catch (err) {
+        this.addDebugMessage(`[fallbackCopyTextToClipboard] Exception during copy: ${String(err)}`);
+        reject(err instanceof Error ? err : new Error(String(err)));
+      } finally {
+        document.body.removeChild(textArea);
+      }
+    });
   }
 
   async copyTextToClipboard(text: string) {
     if (!navigator.clipboard) {
       this.addDebugMessage('[copyTextToClipboard] Clipboard API not available, using fallback method');
-      this.fallbackCopyTextToClipboard(text);
-      return new Promise((r) => setTimeout(r, 250));
+      return await this.fallbackCopyTextToClipboard(text);
     }
 
     try {
@@ -133,8 +145,7 @@ class AppInstall {
       return await navigator.clipboard.writeText(text);
     } catch (err) {
       this.addDebugMessage('[copyTextToClipboard] Error using Clipboard API, using fallback method');
-      this.fallbackCopyTextToClipboard(text);
-      return new Promise((r) => setTimeout(r, 250));
+      return await this.fallbackCopyTextToClipboard(text);
     }
   }
 
@@ -163,6 +174,7 @@ class AppInstall {
       if (!this.isAppOpened) {
         this.addDebugMessage('[launchAppiOS] App not opened, redirecting to App Store');
         window.location.href = storeUrl;
+        this.addDebugMessage(`[launchAppiOS] Redirected to App Store with URL: ${storeUrl}`);
         this.isAppOpened = true;
       }
     }, this.timeout);
